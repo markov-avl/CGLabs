@@ -50,14 +50,43 @@ def bresenham(start: Point, end: Point, drawer: ImageDraw) -> None:
         drawer.point(point, fill='black')
 
 
-@save_image(200, 200)
-def circle_with_digital_differential_analyzer(drawer: ImageDraw):
-    pass
+def set_pixel_4(center: Point, r: int, drawer: ImageDraw):
+    drawer.point(Point(center.x, center.y + r), fill='black')
+    drawer.point(Point(center.x, center.y - r), fill='black')
+    drawer.point(Point(center.x + r, center.y), fill='black')
+    drawer.point(Point(center.x - r, center.y), fill='black')
+
+
+def set_pixel_8(center: Point, point: Point, drawer: ImageDraw):
+    drawer.point(Point(center.x + point.x, center.y + point.y), fill='black')
+    drawer.point(Point(center.x - point.x, center.y + point.y), fill='black')
+    drawer.point(Point(center.x + point.x, center.y - point.y), fill='black')
+    drawer.point(Point(center.x - point.x, center.y - point.y), fill='black')
+    drawer.point(Point(center.x + point.y, center.y + point.x), fill='black')
+    drawer.point(Point(center.x - point.y, center.y + point.x), fill='black')
+    drawer.point(Point(center.x + point.y, center.y - point.x), fill='black')
+    drawer.point(Point(center.x - point.y, center.y - point.x), fill='black')
 
 
 @save_image(200, 200)
-def circle_with_bresenham(drawer: ImageDraw):
-    pass
+def circle_with_bresenham(center: Point, r: int, drawer: ImageDraw):
+    point = Point(x=0, y=r)
+    f = 1 - point.y
+    incr_e = 3
+    incr_se = 5 - 2 * r
+
+    set_pixel_4(center, r, drawer)
+    while point.x <= point.y:
+        if f > 0:
+            point.y -= 1
+            f += incr_se
+            incr_se += 4
+        else:
+            f += incr_e
+            incr_se += 2
+        incr_e += 2
+        point.x += 1
+        set_pixel_8(center, point, drawer)
 
 
 def main() -> None:
@@ -69,8 +98,7 @@ def main() -> None:
     """
     digital_differential_analyzer(start=Point(0, 0), end=Point(100, 10))
     bresenham(start=Point(0, 0), end=Point(100, 100))
-    circle_with_digital_differential_analyzer()
-    circle_with_bresenham()
+    circle_with_bresenham(Point(100, 100), 50)
 
 
 if __name__ == '__main__':
