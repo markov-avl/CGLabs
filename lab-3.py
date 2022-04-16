@@ -50,7 +50,7 @@ def floyd_steinberg(source: str, output: str):
 
     new_image = Image.open(source)
 
-    new_image = new_image.convert('L').convert('1').convert('RGB')
+    new_image = new_image.convert('L').convert('RGB')
     image: PyAccess = new_image.load()
 
     x_size, y_size = new_image.size
@@ -109,7 +109,7 @@ def main() -> None:
     fixed_thresholding('source/image-0.png', 'result/image-0.png')
     random_thresholding('source/image-0.png', 'result/image-1.png')
     ordered_dither('source/image-0.png', 'result/image-2.png')
-    floyd_steinberg('source/image-0.png', 'result/image-3.png')
+    floyd_steinberg('source/image-1.png', 'result/image-3.png')
 
 
 if __name__ == '__main__':
