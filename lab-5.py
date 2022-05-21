@@ -64,11 +64,15 @@ if __name__ == '__main__':
     #     x = new_x
     #     y = new_y
 
+    import matplotlib
+    matplotlib.use('Qt5Agg')
     import matplotlib.pyplot as plt
 
-    # fig, ax = plt.subplots()
-    # xx = np.linspace(-10, 10, 1000)
-    # ax.plot(xx, [math.sin(x) for x in xx], 'r-', lw=3, label='naive')
-    # ax.grid(True)
-    # ax.legend(loc='best')
+    fig, ax = plt.subplots()
+    xx = np.linspace(-10, 10, 1000)
+    ax.plot(xx, [math.sin(x) for x in xx], 'r-', lw=3, label='naive')
+    ax.grid(True)
+    ax.legend(loc='best')
     # plt.show()
+
+    plt.savefig('figures/fig1.png')
