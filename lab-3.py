@@ -13,7 +13,7 @@ def fixed_thresholding(source: str, result: str) -> None:
     image = Image.open(source)
     for x in range(image.width):
         for y in range(image.height):
-            threshold = sum(image.getpixel((x, y))[0: 3]) // 3
+            threshold = sum(image.getpixel((x, y))[: 3]) // 3
             color = (255, 255, 255) if threshold > 128 else (0, 0, 0)
             image.putpixel((x, y), color)
     image.save(result)
@@ -23,7 +23,7 @@ def random_thresholding(source: str, result: str) -> None:
     image = Image.open(source)
     for x in range(image.width):
         for y in range(image.height):
-            threshold = sum(image.getpixel((x, y))[0: 3]) // 3
+            threshold = sum(image.getpixel((x, y))[: 3]) // 3
             color = (255, 255, 255) if threshold > randint(0, 255) else (0, 0, 0)
             image.putpixel((x, y), color)
     image.save(result)
@@ -37,7 +37,7 @@ def ordered_dither(source: str, result: str) -> None:
     image = Image.open(source)
     for x in range(image.width):
         for y in range(image.height):
-            threshold = sum(image.getpixel((x, y))[0: 3]) // 3
+            threshold = sum(image.getpixel((x, y))[: 3]) // 3
             color = (255, 255, 255) if threshold * 5 // 256 > m[x % 2][y % 2] else (0, 0, 0)
             image.putpixel((x, y), color)
     image.save(result)
