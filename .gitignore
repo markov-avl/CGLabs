@@ -147,3 +147,4 @@ crashlytics-build.properties
 fabric.properties
 
 result/*
+/node_modules
