@@ -147,4 +147,5 @@ crashlytics-build.properties
 fabric.properties
 
 result/*
-/node_modules
+*/node_modules
+*/cmake-build-debug

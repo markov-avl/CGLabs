@@ -3,7 +3,8 @@ import math
 import matplotlib.pyplot as plt
 
 
-def interpolate(t, degree, points: list, knots: list = None, weights: list = None):
+# https://github.com/thibauts/b-spline
+def interpolate(t: float, degree: int, points: list, knots: list = None, weights: list = None) -> list:
     n = len(points)
     d = len(points[0])  # point dimensionality
 
@@ -25,7 +26,7 @@ def interpolate(t, degree, points: list, knots: list = None, weights: list = Non
     domain = [degree, len(knots) - 1 - degree]
 
     # remap t to the domain where the spline is defined
-    low  = knots[domain[0]]
+    low = knots[domain[0]]
     high = knots[domain[1]]
     t = t * (high - low) + low
 
@@ -43,12 +44,12 @@ def interpolate(t, degree, points: list, knots: list = None, weights: list = Non
         vector.append(list())
         for j in range(d):
             vector[i].append(points[i][j] * weights[i])
-        vector[i][d] = weights[i]
+        vector[i].append(weights[i])
 
     # l (level) goes from 1 to the curve degree + 1
     for level in range(1, degree + 2):
         # build level l of the pyramid
-        for i in range(level, s - degree - 1 + level, -1):
+        for i in range(s, s - degree - 1 + level, -1):
             alpha = (t - knots[i]) / (knots[i + degree + 1 - level] - knots[i])
             # interpolate each component
             for j in range(d + 1):
@@ -70,29 +71,30 @@ def task_1():
 
 
 if __name__ == '__main__':
-    # https://github.com/thibauts/b-spline
+    save = 'result/fig1.png'
 
-    save = 'figures/fig2.png'
+    points = [
+        [-1.0, 0.0],
+        [-0.5, 0.5],
+        [0.5, -0.5],
+        [1.0, 1]
+    ]
+    degree = 2
 
-    import matplotlib
-    import matplotlib.pyplot as plt
-
-    import subprocess
-    subprocess.run(["rm", save], text=True)
-    xy = subprocess.check_output(["node", "index.js"], text=True)
-    xy = eval('[' + ', '.join(xy.split('\n')) + ']')
-
-    x = [xyi[0] for xyi in xy]
-    y = [xyi[1] for xyi in xy]
+    t = float()
+    x = list()
+    y = list()
+    while t < 1:
+        point = interpolate(t, degree, points)
+        x.append(point[0])
+        y.append(point[1])
+        t += 0.01
 
     fig, ax = plt.subplots()
     xx = np.linspace(-10, 10, 1000)
+    ax.scatter([point[0] for point in points], [point[1] for point in points], c='r')
     ax.plot(x, y, 'g-', lw=3, label='uniform b-spline')
     ax.grid(True)
     ax.legend(loc='best')
-
-    x = np.array([-1.0, -0.5,  0.5, 1.0])
-    y = np.array([ 0.0,  0.5, -0.5, 0.0])
-    ax.scatter(x, y, c='r')
 
     plt.savefig(save)
