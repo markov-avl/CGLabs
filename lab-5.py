@@ -3,7 +3,6 @@ import math
 import matplotlib.pyplot as plt
 
 
-# https://github.com/thibauts/b-spline
 def interpolate(t: float, degree: int, points: list, knots: list = None, weights: list = None) -> list:
     n = len(points)
     d = len(points[0])  # point dimensionality
@@ -31,11 +30,11 @@ def interpolate(t: float, degree: int, points: list, knots: list = None, weights
     t = t * (high - low) + low
 
     if t < low or t > high:
-        raise Exception('out of bounds')
+        raise Exception('t выходит за границы')
 
     # find s (the spline segment) for the [t] value provided
     s = domain[0]
-    while not (t >= knots[s] and t <= knots[s + 1]):
+    while not t >= knots[s] and t <= knots[s + 1]:
         s += 1
 
     # convert points to homogeneous coordinates
@@ -74,27 +73,42 @@ if __name__ == '__main__':
     save = 'result/fig1.png'
 
     points = [
-        [-1.0, 0.0],
-        [-0.5, 0.5],
-        [0.5, -0.5],
-        [1.0, 1]
+        # list(map(float, input('Введите 1 координату точки через пробел (x y): ').split())),
+        # list(map(float, input('Введите 2 координату точки через пробел (x y): ').split()))
+        # [-1.0, 0.0],
+        # [-0.5, 0.5],
+        # [0.5, -0.5],
+        # [1.0, 1]
+        [0, 0],
+        [0, 4],
+        [4, 4],
+        [4, 0],
+        [8, 0],
+        [12, 4],
+        [14, 4],
+        [14, 0]
     ]
-    degree = 2
+    # degree = 1
+    degree = len(points) - 1
 
-    t = float()
-    x = list()
-    y = list()
-    while t < 1:
-        point = interpolate(t, degree, points)
-        x.append(point[0])
-        y.append(point[1])
-        t += 0.01
+    while (xy := input('Введите координаты точки через пробел (x y): ')) or True:
+        # points.append(list(map(float, xy.split())))
+        # degree += 1
+        t = float()
+        x = list()
+        y = list()
+        while t < 1:
+            point = interpolate(t, degree, points)
+            x.append(point[0])
+            y.append(point[1])
+            t += 0.01
 
-    fig, ax = plt.subplots()
-    xx = np.linspace(-10, 10, 1000)
-    ax.scatter([point[0] for point in points], [point[1] for point in points], c='r')
-    ax.plot(x, y, 'g-', lw=3, label='uniform b-spline')
-    ax.grid(True)
-    ax.legend(loc='best')
+        fig, ax = plt.subplots()
+        xx = np.linspace(-10, 10, 1000)
+        ax.scatter([point[0] for point in points], [point[1] for point in points], c='r')
+        ax.plot(x, y, 'g-', lw=3, label='uniform b-spline')
+        ax.grid(True)
+        ax.legend(loc='best')
+        plt.show()
 
     plt.savefig(save)
