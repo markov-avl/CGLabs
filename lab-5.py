@@ -89,26 +89,25 @@ if __name__ == '__main__':
         [14, 0]
     ]
     # degree = 1
-    degree = len(points) - 1
+    degree = 4
 
-    while (xy := input('Введите координаты точки через пробел (x y): ')) or True:
+    # while (xy := input('Введите координаты точки через пробел (x y): ')):
         # points.append(list(map(float, xy.split())))
         # degree += 1
-        t = float()
-        x = list()
-        y = list()
-        while t < 1:
-            point = interpolate(t, degree, points)
-            x.append(point[0])
-            y.append(point[1])
-            t += 0.01
+    t = float()
+    x = list()
+    y = list()
+    while t < 1:
+        point = interpolate(t, degree, points)
+        x.append(point[0])
+        y.append(point[1])
+        t += 0.01
 
-        fig, ax = plt.subplots()
-        xx = np.linspace(-10, 10, 1000)
-        ax.scatter([point[0] for point in points], [point[1] for point in points], c='r')
-        ax.plot(x, y, 'g-', lw=3, label='uniform b-spline')
-        ax.grid(True)
-        ax.legend(loc='best')
-        plt.show()
+    fig, ax = plt.subplots()
+    ax.scatter([point[0] for point in points], [point[1] for point in points], c='r')
+    ax.plot(x, y, 'g-', lw=3, label='uniform b-spline')
+    ax.grid(True)
+    ax.legend(loc='best')
+    plt.show()
 
     plt.savefig(save)
