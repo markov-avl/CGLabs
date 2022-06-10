@@ -65,7 +65,7 @@ void reshape(int w, int h) {
 }
 
 void idle() {
-    yRotated += -0.02;
+    yRotated += -0.01;
     display();
 }
 
@@ -86,7 +86,7 @@ void init() {
     GLfloat mat_shininess[] = {50.0};
     GLfloat light_position[] = {1.0, 1.0, 1.0, 0.0};
     glClearColor(0.0, 0.0, 0.0, 0.0);
-//    glShadeModel(GL_SMOOTH);
+    glShadeModel(GL_SMOOTH);
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);

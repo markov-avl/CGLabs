@@ -1,9 +1,12 @@
+import matplotlib
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from sympy import symbols, Eq, solve
 
 
-def interpolate(t: float, degree: int, points: list, knots: list = None, weights: list = None) -> list:
+def interpolate(t: float, degree: int, points: list, knots: list = None, weights: list = None) -> tuple[list, list]:
     n = len(points)
     d = len(points[0])  # point dimensionality
 
@@ -54,61 +57,77 @@ def interpolate(t: float, degree: int, points: list, knots: list = None, weights
             for j in range(d + 1):
                 vector[i][j] = (1 - alpha) * vector[i - 1][j] + alpha * vector[i][j]
 
+    v = vector.copy()[: s + 1]
+    x_, y_ = symbols('x y')
+    for i in range(1, len(v)):
+        if v[i - 1][0] == x[i - 1] and v[i - 1][1] == y[i - 1]:
+            continue
+        eq1 = Eq((x_ - vector[i - 1][0]) * (vector[i][1] - vector[i - 1][1]), (y_ - vector[i - 1][1]) * (
+                    vector[i][0] - vector[i - 1][0]))
+        eq2 = Eq((x_ - x[i - 1]) * (y[i] - y[i - 1]), (y_ - y[i - 1]) * (x[i] - x[i - 1]))
+        sol = solve((eq1, eq2), (x_, y_))
+        x__ = sol.get(x_) if sol.get(x_) else 0
+        y__ = sol.get(y_) if sol.get(y_) else 0
+        # if vector[i][0] <= x__ <= x[i] and vector[i][1] <= y__ <= y[i]:
+        v[i] = [x__, y__]
+
     # convert back to cartesian and return
-    return [vector[s][i] / vector[s][d] for i in range(d)]
+    return [vector[s][i] / vector[s][d] for i in range(d)], v
 
 
-def task_1():
-    """
-    Реализовать интерактивную среду демонстрации
-    параметрических кубических кривых (выполнять интерполяцию
-    по нескольким точкам, использовать uniform B-spline и сплайн
-    Катмула-Рома). Дополнительное задание: реализовать
-    изменение весов точек и визуализацию рациональными
-    кривыми.
-    """
+"""
+Реализовать интерактивную среду демонстрации
+параметрических кубических кривых (выполнять интерполяцию
+по нескольким точкам, использовать uniform B-spline и сплайн
+Катмула-Рома). Дополнительное задание: реализовать
+изменение весов точек и визуализацию рациональными
+кривыми.
+"""
+
+matplotlib.use('Qt5Agg')
+fig, ax = plt.subplots()
+ln, = plt.plot([], [], 'g-', lw=3, label='uniform b-spline')
+vectorplt, = plt.plot([], [], 'b-', lw=1)
+xdata, ydata = [], []
+
+points = [
+    [0, 0],
+    [0, 4],
+    [4, 4],
+    [4, 0],
+    [8, 0],
+    [12, 4],
+    [14, 4],
+    [14, 0]
+]
+degree = 2
+x = [point[0] for point in points]
+y = [point[1] for point in points]
+
+
+def init():
+    ax.set_xlim(min(x) - 1, max(x) + 1)
+    ax.set_ylim(min(y) - 1, max(y) + 1)
+    ax.scatter(x, y, c='r')
+    ax.plot(x, y, c='black', lw=1)
+    ax.grid(True)
+    ax.legend(loc='best')
+    return ln,
+
+
+def update(t):
+    if t == 0:
+        xdata.clear()
+        ydata.clear()
+    point, vectors = interpolate(t, degree, points)
+    xdata.append(point[0])
+    ydata.append(point[1])
+    ln.set_data(xdata, ydata)
+    vectorplt.set_data([vector[0] for vector in vectors], [vector[1] for vector in vectors])
+    return ln, vectorplt,
 
 
 if __name__ == '__main__':
-    save = 'result/fig1.png'
-
-    points = [
-        # list(map(float, input('Введите 1 координату точки через пробел (x y): ').split())),
-        # list(map(float, input('Введите 2 координату точки через пробел (x y): ').split()))
-        # [-1.0, 0.0],
-        # [-0.5, 0.5],
-        # [0.5, -0.5],
-        # [1.0, 1]
-        [0, 0],
-        [0, 4],
-        [4, 4],
-        [4, 0],
-        [8, 0],
-        [12, 4],
-        [14, 4],
-        [14, 0]
-    ]
-    # degree = 1
-    degree = 3
-
-    # while (xy := input('Введите координаты точки через пробел (x y): ')):
-        # points.append(list(map(float, xy.split())))
-        # degree += 1
-    t = float()
-    x = list()
-    y = list()
-    while t < 1:
-        point = interpolate(t, degree, points)
-        print(point)
-        x.append(point[0])
-        y.append(point[1])
-        t += 0.01
-
-    fig, ax = plt.subplots()
-    ax.scatter([point[0] for point in points], [point[1] for point in points], c='r')
-    ax.plot(x, y, 'g-', lw=3, label='uniform b-spline')
-    ax.grid(True)
-    ax.legend(loc='best')
+    ani = FuncAnimation(fig, update, frames=np.linspace(0, 1, 99),
+                        init_func=init, blit=True)
     plt.show()
-
-    plt.savefig(save)
