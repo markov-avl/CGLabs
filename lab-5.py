@@ -34,7 +34,7 @@ def interpolate(t: float, degree: int, points: list, knots: list = None, weights
 
     # find s (the spline segment) for the [t] value provided
     s = domain[0]
-    while not t >= knots[s] and t <= knots[s + 1]:
+    while not (knots[s] <= t <= knots[s + 1]):
         s += 1
 
     # convert points to homogeneous coordinates
@@ -89,7 +89,7 @@ if __name__ == '__main__':
         [14, 0]
     ]
     # degree = 1
-    degree = 4
+    degree = 3
 
     # while (xy := input('Введите координаты точки через пробел (x y): ')):
         # points.append(list(map(float, xy.split())))
@@ -99,6 +99,7 @@ if __name__ == '__main__':
     y = list()
     while t < 1:
         point = interpolate(t, degree, points)
+        print(point)
         x.append(point[0])
         y.append(point[1])
         t += 0.01

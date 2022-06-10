@@ -91,7 +91,7 @@ def draw_grid(image: Image, grid: np.ndarray) -> None:
 
 if __name__ == '__main__':
     image = Image.open('source/image-2.png')
-    rows = 10
+    rows = 5
     columns = 5
 
     grid = griddify((0, 0, image.width, image.height), rows, columns)
