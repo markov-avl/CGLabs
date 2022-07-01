@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -52,8 +53,6 @@ public:
 
     T length2() const { return x * x + y * y + z * z; }
 
-    T length() const { return sqrt(length2()); }
-
     friend std::ostream &operator<<(std::ostream &os, const Vec3<T> &v) {
         os << "[" << v.x << " " << v.y << " " << v.z << "]";
         return os;
@@ -84,7 +83,7 @@ public:
         if (tca < 0) return false;
         float d2 = l.dot(l) - tca * tca;
         if (d2 > radius2) return false;
-        float thc = sqrt(radius2 - d2);
+        float thc = std::sqrt(radius2 - d2);
         t0 = tca - thc;
         t1 = tca + thc;
 
@@ -115,39 +114,34 @@ Vec3f trace(
             }
         }
     }
-    // if there's no intersection return black or background color
+
     if (!sphere) return Vec3f(2);
-    Vec3f surfaceColor = 0; // color of the ray/surfaceof the object intersected by the ray
-    Vec3f phit = rayorig + raydir * tnear; // point of intersection
-    Vec3f nhit = phit - sphere->center; // normal at the intersection point
-    nhit.normalize(); // normalize normal direction
-    // If the normal and the view direction are not opposite to each other
-    // reverse the normal direction. That also means we are inside the sphere so set
-    // the inside bool to true. Finally reverse the sign of IdotN which we want
-    // positive.
-    float bias = 1e-4; // add some bias to the point from which we will be tracing
+    Vec3f surfaceColor = 0;
+    Vec3f phit = rayorig + raydir * tnear;
+    Vec3f nhit = phit - sphere->center;
+    nhit.normalize();
+
+    float bias = 1e-4;
     bool inside = false;
     if (raydir.dot(nhit) > 0) nhit = -nhit, inside = true;
     if ((sphere->transparency > 0 || sphere->reflection > 0) && depth < MAX_RAY_DEPTH) {
         float facingratio = -raydir.dot(nhit);
-        // change the mix value to tweak the effect
         float fresneleffect = mix(pow(1 - facingratio, 3), 1, 0.1);
-        // compute reflection direction (not need to normalize because all vectors
-        // are already normalized)
+
         Vec3f refldir = raydir - nhit * 2 * raydir.dot(nhit);
         refldir.normalize();
         Vec3f reflection = trace(phit + nhit * bias, refldir, spheres, depth + 1);
         Vec3f refraction = 0;
-        // if the sphere is also transparent compute refraction ray (transmission)
+
         if (sphere->transparency) {
-            float ior = 1.1, eta = (inside) ? ior : 1 / ior; // are we inside or outside the surface?
+            float ior = 1.1, eta = (inside) ? ior : 1 / ior;
             float cosi = -nhit.dot(raydir);
             float k = 1 - eta * eta * (1 - cosi * cosi);
             Vec3f refrdir = raydir * eta + nhit * (eta * cosi - sqrt(k));
             refrdir.normalize();
             refraction = trace(phit - nhit * bias, refrdir, spheres, depth + 1);
         }
-        // the result is a mix of reflection and refraction (if the sphere is transparent)
+
         surfaceColor = (
                                reflection * fresneleffect +
                                refraction * (1 - fresneleffect) * sphere->transparency) * sphere->surfaceColor;
@@ -191,8 +185,8 @@ void render(const std::vector<Sphere> &spheres) {
             *pixel = trace(Vec3f(0), raydir, spheres, 0);
         }
     }
-    // Save result to a PPM image (keep these flags if you compile under Windows)
-    std::ofstream ofs("../result.png", std::ios::out | std::ios::binary);
+
+    std::ofstream ofs("../result.ppm", std::ios::out | std::ios::binary);
     ofs << "P6\n" << width << " " << height << "\n255\n";
     for (unsigned i = 0; i < width * height; ++i) {
         ofs << (unsigned char) (std::min(float(1), image[i].x) * 255) <<
@@ -204,12 +198,12 @@ void render(const std::vector<Sphere> &spheres) {
 }
 
 
-int main(int argc, char **argv) {
+int main() {
     srand(13);
     std::vector<Sphere> spheres;
-    spheres.push_back(Sphere(Vec3f(0.0, 0, -20), 4, Vec3f(1.00, 0.62, 0.16), 1, 0.5));
-    spheres.push_back(Sphere(Vec3f(5.0, -1, -15), 2, Vec3f(0.10, 0.16, 0.66), 1, 0.0));
-    spheres.push_back(Sphere(Vec3f(0.0, 20, -30), 3, Vec3f(0.00, 0.00, 0.00), 0, 0.0, Vec3f(3)));
+    spheres.emplace_back(Vec3f(0.0, 0, -20), 4, Vec3f(1.00, 1, 1), 1, 0.5);
+    spheres.emplace_back(Vec3f(5.0, -1, -15), 2, Vec3f(0.10, 0.16, 0.66), 1, 0.0);
+    spheres.emplace_back(Vec3f(0.0, 20, -30), 3, Vec3f(0.00, 0.00, 0.00), 0, 0.0, Vec3f(3));
     render(spheres);
 
     return 0;
