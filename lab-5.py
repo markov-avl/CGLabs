@@ -57,19 +57,20 @@ def interpolate(t: float, degree: int, points: list, knots: list = None, weights
             for j in range(d + 1):
                 vector[i][j] = (1 - alpha) * vector[i - 1][j] + alpha * vector[i][j]
 
-    v = vector.copy()[: s + 1]
-    x_, y_ = symbols('x y')
-    for i in range(1, len(v)):
-        if v[i - 1][0] == x[i - 1] and v[i - 1][1] == y[i - 1]:
-            continue
-        eq1 = Eq((x_ - vector[i - 1][0]) * (vector[i][1] - vector[i - 1][1]), (y_ - vector[i - 1][1]) * (
-                    vector[i][0] - vector[i - 1][0]))
-        eq2 = Eq((x_ - x[i - 1]) * (y[i] - y[i - 1]), (y_ - y[i - 1]) * (x[i] - x[i - 1]))
-        sol = solve((eq1, eq2), (x_, y_))
-        x__ = sol.get(x_) if sol.get(x_) else 0
-        y__ = sol.get(y_) if sol.get(y_) else 0
-        # if vector[i][0] <= x__ <= x[i] and vector[i][1] <= y__ <= y[i]:
-        v[i] = [x__, y__]
+    v = []
+    # v = vector.copy()[: s + 1]
+    # x_, y_ = symbols('x y')
+    # for i in range(1, len(v)):
+    #     if v[i - 1][0] == x[i - 1] and v[i - 1][1] == y[i - 1]:
+    #         continue
+    #     eq1 = Eq((x_ - vector[i - 1][0]) * (vector[i][1] - vector[i - 1][1]), (y_ - vector[i - 1][1]) * (
+    #                 vector[i][0] - vector[i - 1][0]))
+    #     eq2 = Eq((x_ - x[i - 1]) * (y[i] - y[i - 1]), (y_ - y[i - 1]) * (x[i] - x[i - 1]))
+    #     sol = solve((eq1, eq2), (x_, y_))
+    #     x__ = sol.get(x_) if sol.get(x_) else 0
+    #     y__ = sol.get(y_) if sol.get(y_) else 0
+    #     # if vector[i][0] <= x__ <= x[i] and vector[i][1] <= y__ <= y[i]:
+    #     v[i] = [x__, y__]
 
     # convert back to cartesian and return
     return [vector[s][i] / vector[s][d] for i in range(d)], v
@@ -91,14 +92,12 @@ vectorplt, = plt.plot([], [], 'b-', lw=1)
 xdata, ydata = [], []
 
 points = [
-    [0, 0],
-    [0, 4],
-    [4, 4],
-    [4, 0],
-    [8, 0],
-    [12, 4],
-    [14, 4],
-    [14, 0]
+    [0,           np.sin(0)],
+    [0.2 * np.pi, np.sin(0.2 * np.pi)],
+    [0.4 * np.pi, np.sin(0.4 * np.pi)],
+    [0.6 * np.pi, np.sin(0.6 * np.pi)],
+    [0.8 * np.pi, np.sin(0.8 * np.pi)],
+    [np.pi,       np.sin(np.pi)]
 ]
 degree = 2
 x = [point[0] for point in points]
